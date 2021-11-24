@@ -1,0 +1,6 @@
+# Environments
+venv/
+
+# DataFrame
+logins.parquet3
+logins-40.parquet3
