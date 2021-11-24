@@ -4,7 +4,7 @@
 `python -m venv venv`
 
 ## Activate venv (windows)
-`cd venv/scripts && activate`
+`cd venv/scripts && activate && cd .. && cd ..`
 
 ## Install dependencies
 `pip install requirements.txt`
