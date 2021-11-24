@@ -51,13 +51,13 @@ def clearDataframe(parquetPath: str):
 
 def printAnomalousLine(line: np.array, count: int):
     error = ""
-    if line[0] == "":
+    if line[0] == "" or line[0] == None:
         error += f"ID empty {str(line[0])} | "
-    if line[1] == "":
+    if line[1] == "" or line[1] == None:
         error += f"accountID empty {str(line[1])} | "
-    if line[2] == "":
+    if line[2] == "" or line[2] == None:
         error += f"deviceID empty {str(line[2])} | "
-    if line[3] == "":
+    if line[3] == "" or line[3] == None:
         error += f"installationID empty {str(line[3])} | "
     if line[5] != 1 and line[5] != 0:
         error += f"isFromOfficialStore not bool {str(line[5])} | "
@@ -75,25 +75,83 @@ def printAnomalousLine(line: np.array, count: int):
         error += f"ato not bool {str(line[16])} | "
     
     if(error != ""):
-        print(error + str(count))  
+        print(error + str(count))
+        return True
+    return False
+
+
+def lineIsSafe(line: np.array):
+    if line[0] == "" or line[0] == None:
+        return False
+    elif line[1] == "" or line[1] == None:
+        return False
+    elif line[2] == "" or line[2] == None:
+        return False
+    elif line[3] == "" or line[3] == None:
+        return False
+    elif line[5] != 1 and line[5] != 0:
+        return False
+    elif line[6] != 1 and line[6] != 0:
+        return False
+    elif line[7] != 1 and line[7] != 0:
+        return False
+    elif line[8] != 1 and line[8] != 0:
+        return False
+    elif line[9] != 1 and line[9] != 0:
+        return False
+    elif line[12] != 1 and line[12] != 0:
+        return False
+    elif line[16] != 1 and line[16] != 0:
+        return False
+    
+    return True
+    
     
 
 def searchAnomalies(parquetPath: str):
-    print("*--abrindo dataframe--*")
+    print("*--abrindo database--*")
     dataframe = pd.read_parquet(f'{parquetPath}.parquet3', engine="pyarrow")
-    print("*--convertendo dataframe--*")
+    print("*--convertendo database--*")
     trash = dataframe.to_numpy()
     print("*--iniciando busca--*")
+    nRowsErrors = 0
     count = 0
     for row in trash:
-        printAnomalousLine(row, count)
+        if(printAnomalousLine(row, count)):
+            nRowsErrors += 1
         count += 1
+    print(f"Numero de linhas: {count}")
+    print(f"Numero de linhas falhas: {nRowsErrors}")
+
+def cleannerDatabase(parquetPath: str):
+    print("*--abrindo database--*")
+    dataframe = pd.read_parquet(f'{parquetPath}.parquet3', engine="pyarrow")
+    columns = dataframe.columns
+    print("*--convertendo database--*")
+    trash = dataframe.to_numpy()
+    print("*--percorrendo a database--*")
+    count = 0
+    indexes = np.zeros(246)
+    index = 0
+    for row in trash:
+        if(lineIsSafe(row) == False):
+            indexes[index] = count
+            index += 1
+        count += 1
+    print("*--deletando os itens anomalos--*")
+    trash = np.delete(trash, indexes)
+    print(len(trash))
+    print("*--criando nova database--*")
+    database = pd.DataFrame(trash, columns=columns)
+    print("*--salvando a database--*")
+    database.to_parquet("teste.parquet3")
+
 
 def deleteAnomaliesLines(parquetPath: str):
     pass
 
 if (__name__ == "__main__"):
     # floatToBooleanColumn("logins-40", "is_emulator")
-    searchAnomalies("logins")
+    cleannerDatabase("logins")
     
         
