@@ -131,15 +131,17 @@ def cleannerDatabase(parquetPath: str):
     trash = dataframe.to_numpy()
     print("*--percorrendo a database--*")
     count = 0
-    indexes = np.zeros(246)
-    index = 0
+    indexes = []
     for row in trash:
         if(lineIsSafe(row) == False):
-            indexes[index] = count
-            index += 1
+            indexes.append(count)
         count += 1
     print("*--deletando os itens anomalos--*")
-    trash = np.delete(trash, indexes)
+    print(trash[0])
+    print(trash[1])
+    print(trash[2])
+    print(trash[3])
+    trash = np.delete(trash, indexes, axis=0)
     print(len(trash))
     print("*--criando nova database--*")
     database = pd.DataFrame(trash, columns=columns)
@@ -152,6 +154,7 @@ def deleteAnomaliesLines(parquetPath: str):
 
 if (__name__ == "__main__"):
     # floatToBooleanColumn("logins-40", "is_emulator")
-    cleannerDatabase("logins")
+    # cleannerDatabase("logins")
+    searchAnomalies("teste")
     
         

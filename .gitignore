@@ -4,3 +4,4 @@ venv/
 # DataFrame
 logins.parquet3
 logins-40.parquet3
+logins-clean.parquet3
